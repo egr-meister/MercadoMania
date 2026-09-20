@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Golden Bazaar" palette. The Compose layer owns the real theme
+  (see ui/theme/Color.kt); these entries exist for the window background,
+  the splash screen and the adaptive icon.
+-->
+<resources>
+    <color name="mm_midnight">#FF02133F</color>
+    <color name="mm_royal">#FF0A2A8C</color>
+    <color name="mm_gold">#FFFFC800</color>
+    <color name="mm_cream">#FFFFF7DC</color>
+</resources>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mercado Mania</string>
+
+    <!-- Main / menu -->
+    <string name="main_tagline">The golden bazaar is open</string>
+    <string name="action_start">Start</string>
+    <string name="menu_title">Choose Your Stall</string>
+    <string name="menu_quiz">Quiz</string>
+    <string name="menu_pairs">Matching Pairs</string>
+    <string name="menu_results">Results</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_rules">Game Rules</string>
+
+    <!-- Common actions -->
+    <string name="action_continue">Continue</string>
+    <string name="action_restart">Restart</string>
+    <string name="action_menu">Menu</string>
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_play">Play</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_reset">Reset</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_back">Go back</string>
+    <string name="cd_pause">Pause the game</string>
+    <string name="cd_logo">Mercado Mania logo</string>
+    <string name="cd_mascot_genie">Zafir the lamp genie, the bazaar host</string>
+    <string name="cd_mascot_gecko">Pico the golden gecko, the bazaar runner</string>
+    <string name="cd_mascot_robot">Tino the automaton trader</string>
+    <string name="cd_background">Decorative golden bazaar background</string>
+    <string name="cd_card_face_down">Face down card</string>
+    <string name="cd_card_face_up">Card showing %1$s</string>
+    <string name="cd_card_matched">Matched card showing %1$s</string>
+    <string name="cd_level_locked">Level %1$d, locked. Clear level %2$d first.</string>
+    <string name="cd_level_unlocked">Level %1$d, unlocked</string>
+    <string name="cd_level_cleared">Level %1$d, cleared</string>
+
+    <!-- Quiz -->
+    <string name="quiz_title">Bazaar Quiz</string>
+    <string name="quiz_pick_category">Pick a category</string>
+    <string name="quiz_progress">%1$d/%2$d</string>
+    <string name="quiz_best">Best: %1$d/%2$d</string>
+    <string name="quiz_not_played">Not played yet</string>
+    <string name="quiz_score">Score: %1$d/%2$d</string>
+    <string name="quiz_answer_correct">Correct</string>
+    <string name="quiz_answer_wrong">Wrong</string>
+    <string name="quiz_question_number">Question %1$d of %2$d</string>
+
+    <!-- Pairs -->
+    <string name="pairs_title">Matching Pairs</string>
+    <string name="pairs_levels_title">Pick a level</string>
+    <string name="pairs_level">Level %1$d</string>
+    <string name="pairs_time">%1$02d:%2$02d</string>
+    <string name="pairs_found">Pairs %1$d/%2$d</string>
+    <string name="pairs_win">Well Done</string>
+    <string name="pairs_lose">Out of Time</string>
+    <string name="pairs_best">Best: %1$d/%2$d pairs</string>
+    <string name="pairs_cleared_summary">Levels cleared: %1$d/%2$d</string>
+    <string name="pairs_locked_toast">Clear the previous level first</string>
+
+    <!-- Pause -->
+    <string name="pause_title">Paused</string>
+
+    <!-- Results summary -->
+    <string name="results_title">Your Results</string>
+    <string name="results_quiz_header">Quiz best scores</string>
+    <string name="results_pairs_header">Matching Pairs</string>
+    <string name="results_empty">Nothing here yet. Play a round and your bests will show up.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_sound">Sound effects</string>
+    <string name="settings_sound_on">On</string>
+    <string name="settings_sound_off">Off</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_rate">Rate the game</string>
+    <string name="settings_reset">Reset progress</string>
+    <string name="settings_reset_confirm_title">Reset all progress?</string>
+    <string name="settings_reset_confirm_body">Every best score and every unlocked level will be erased. This cannot be undone.</string>
+    <string name="settings_reset_done">Progress reset</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_offline_note">Mercado Mania is fully offline. Nothing you do here leaves your device.</string>
+    <string name="settings_no_browser">No app on this device can open that link.</string>
+    <string name="settings_no_store">No app store available on this device.</string>
+
+    <!-- Privacy policy text shown in-app (offline, no network) -->
+    <string name="privacy_title">Privacy</string>
+    <string name="privacy_body">Mercado Mania works completely offline.\n\n• The app requests no permissions and has no internet access.\n• Your best scores and your sound setting are stored only on this device.\n• Nothing is collected, uploaded, shared or sold.\n• Resetting progress in Settings removes everything the app has stored.</string>
+
+    <!-- Rules -->
+    <string name="rules_title">Game Rules</string>
+    <string name="rules_quiz_header">Quiz</string>
+    <string name="rules_quiz_body">Pick a category and answer ten questions, one at a time. Tap an answer and the correct option lights up green with a check mark; a wrong pick turns red with a cross. The next question arrives on its own. Your best score per category is kept.</string>
+    <string name="rules_pairs_header">Matching Pairs</string>
+    <string name="rules_pairs_body">Flip two cards per turn. A matching pair stays open; anything else flips back. Clear every pair before the timer runs out to win the level. Each level you clear unlocks the next one, and your best number of matched pairs is kept per level.</string>
+    <string name="rules_general_header">Good to know</string>
+    <string name="rules_general_body">Pause at any time with the pause button — the timer stops with you. Everything is saved on this device, and Settings lets you wipe it all whenever you like.</string>
+
+    <!-- Fallback -->
+    <string name="fallback_title">This stall is closed</string>
+    <string name="fallback_body">That screen could not be opened. Head back and pick another one.</string>
+    <string name="fallback_locked">That level is still locked. Clear the level before it first.</string>
+</resources>

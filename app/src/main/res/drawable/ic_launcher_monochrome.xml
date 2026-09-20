@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Themed-icon (monochrome) layer for the adaptive launcher icon.
+  A flat silhouette of the Mercado Mania crest: crowned dome + block "M".
+  Drawn inside the 66dp adaptive safe zone of the 108dp viewport.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Crowned dome -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,32 C40,32 32,42 32,54 L32,58 L76,58 L76,54 C76,42 68,32 54,32 Z" />
+
+    <!-- Centre spike -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,20 L59,30 L54,36 L49,30 Z" />
+
+    <!-- Side spikes -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M40,26 L45,34 L38,38 L35,30 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M68,26 L73,30 L70,38 L63,34 Z" />
+
+    <!-- Block "M" -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M37,80 L37,46 L47,46 L54,60 L61,46 L71,46 L71,80 L63,80 L63,58 L57,70 L51,70 L45,58 L45,80 Z" />
+
+    <!-- Sparkles -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M28,64 L30,69 L35,71 L30,73 L28,78 L26,73 L21,71 L26,69 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M80,64 L82,69 L87,71 L82,73 L80,78 L78,73 L73,71 L78,69 Z" />
+</vector>

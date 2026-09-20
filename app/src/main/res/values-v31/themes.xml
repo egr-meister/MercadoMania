@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- On API 31+ the platform draws the splash itself, so use the official
+         SplashScreen attributes instead of a windowBackground drawable. -->
+    <style name="Theme.MercadoMania.Splash" parent="Theme.MercadoMania">
+        <item name="android:windowSplashScreenBackground">@color/mm_midnight</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/mm_royal</item>
+    </style>
+
+</resources>

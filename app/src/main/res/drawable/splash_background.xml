@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash window background used on API 24-30 (API 31+ uses the platform
+  SplashScreen attributes declared in values-v31/themes.xml).
+  Theme background colour + the small crest. No heavy asset.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/mm_midnight" />
+    <item
+        android:gravity="center"
+        android:width="200dp"
+        android:height="200dp"
+        android:drawable="@drawable/splash_logo" />
+</layer-list>
