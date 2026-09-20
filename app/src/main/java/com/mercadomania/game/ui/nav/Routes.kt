@@ -12,6 +12,9 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
+data object LoadingRoute
+
+@Serializable
 data object MainRoute
 
 @Serializable

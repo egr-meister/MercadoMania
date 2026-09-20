@@ -8,7 +8,7 @@
     <item android:drawable="@color/mm_midnight" />
     <item
         android:gravity="center"
-        android:width="200dp"
-        android:height="200dp"
-        android:drawable="@drawable/splash_logo" />
+        android:width="220dp"
+        android:height="212dp"
+        android:drawable="@drawable/splash_badge" />
 </layer-list>

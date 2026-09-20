@@ -13,11 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,7 +26,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mercadomania.game.R
 import com.mercadomania.game.ui.Assets
@@ -109,18 +105,6 @@ fun MainScreen(
                         rotationZ = (sway - 0.5f) * 2.4f
                         translationY = sin(sway * 3.14159f) * 6f
                     }
-            )
-
-            Text(
-                text = stringResource(R.string.main_tagline),
-                style = MaterialTheme.typography.titleMedium,
-                color = BazaarPalette.Cream,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = screenHeight * 0.075f + screenWidth * 0.70f / Assets.LOGO_ASPECT)
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
             )
 
             // --- Sparkle dust around the middle of the floor ----------------

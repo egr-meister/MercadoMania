@@ -28,6 +28,8 @@ import kotlinx.coroutines.launch
 data class QuizUiState(
     val categoryId: String = "",
     val categoryTitle: String = "",
+    /** Index into `Assets.mascots` - this category's host. */
+    val mascotIndex: Int = 0,
     val questionIndex: Int = 0,
     val totalQuestions: Int = 0,
     val question: QuizQuestion? = null,
@@ -78,6 +80,7 @@ class QuizViewModel(
         return QuizUiState(
             categoryId = categoryId,
             categoryTitle = category?.title.orEmpty(),
+            mascotIndex = category?.mascotIndex ?: 0,
             questionIndex = 0,
             totalQuestions = questions.size,
             question = questions.firstOrNull(),

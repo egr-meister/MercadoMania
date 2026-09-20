@@ -4,6 +4,9 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
 import com.mercadomania.game.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.ConcurrentHashMap
 
 /** Every sound effect the game can play. */
@@ -44,18 +47,39 @@ class SoundManager(context: Context) {
     private val sampleIds = ConcurrentHashMap<Sfx, Int>()
     private val readyIds = ConcurrentHashMap.newKeySet<Int>()
 
+    /**
+     * How many samples have finished loading. The loading screen watches this,
+     * because SoundPool decoding is genuine startup work.
+     */
+    private val _loadedSamples = MutableStateFlow(0)
+    val loadedSamples: StateFlow<Int> = _loadedSamples.asStateFlow()
+
+    /** How many samples were actually handed to SoundPool. */
+    @Volatile
+    var expectedSamples: Int = 0
+        private set
+
     @Volatile
     private var released = false
 
     init {
         pool.setOnLoadCompleteListener { _, sampleId, status ->
-            if (status == 0) readyIds.add(sampleId)
+            if (status == 0 && readyIds.add(sampleId)) {
+                _loadedSamples.value = readyIds.size
+            }
         }
         val appContext = context.applicationContext
+        var requested = 0
         Sfx.entries.forEach { sfx ->
             runCatching { pool.load(appContext, sfx.resId, 1) }
-                .onSuccess { id -> if (id != 0) sampleIds[sfx] = id }
+                .onSuccess { id ->
+                    if (id != 0) {
+                        sampleIds[sfx] = id
+                        requested++
+                    }
+                }
         }
+        expectedSamples = requested
     }
 
     /** Plays [sfx] if sound is on and the sample finished loading. */

@@ -2,8 +2,11 @@
 <resources>
     <string name="app_name">Mercado Mania</string>
 
+    <!-- Loading -->
+    <string name="loading_percent">%1$d%%</string>
+    <string name="cd_loading">Loading, %1$d percent complete</string>
+
     <!-- Main / menu -->
-    <string name="main_tagline">The golden bazaar is open</string>
     <string name="action_start">Start</string>
     <string name="menu_title">Choose Your Stall</string>
     <string name="menu_quiz">Quiz</string>

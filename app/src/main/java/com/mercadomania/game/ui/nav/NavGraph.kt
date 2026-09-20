@@ -2,6 +2,7 @@ package com.mercadomania.game.ui.nav
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import com.mercadomania.game.game.QuizContent
 import com.mercadomania.game.mercadoAppOrNull
 import com.mercadomania.game.ui.screens.FallbackScreen
 import com.mercadomania.game.ui.screens.LevelsScreen
+import com.mercadomania.game.ui.screens.LoadingScreen
 import com.mercadomania.game.ui.screens.MainScreen
 import com.mercadomania.game.ui.screens.MenuScreen
 import com.mercadomania.game.ui.screens.PairsScreen
@@ -32,6 +34,8 @@ import com.mercadomania.game.ui.screens.RulesScreen
 import com.mercadomania.game.ui.screens.SettingsScreen
 import com.mercadomania.game.ui.viewmodel.GameDataViewModel
 import com.mercadomania.game.ui.viewmodel.GameDataViewModelFactory
+import com.mercadomania.game.ui.viewmodel.LoadingViewModel
+import com.mercadomania.game.ui.viewmodel.LoadingViewModelFactory
 import com.mercadomania.game.ui.viewmodel.PairsOutcome
 import com.mercadomania.game.ui.viewmodel.PairsViewModel
 import com.mercadomania.game.ui.viewmodel.PairsViewModelFactory
@@ -71,9 +75,28 @@ fun MercadoNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = MainRoute,
+        startDestination = LoadingRoute,
         modifier = modifier.fillMaxSize()
     ) {
+
+        composable<LoadingRoute> {
+            val vm: LoadingViewModel = viewModel(
+                factory = LoadingViewModelFactory(context, repository, soundManager)
+            )
+            val state by vm.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(state.ready) {
+                if (state.ready) {
+                    navController.navigate(MainRoute) {
+                        // The loading screen must not come back on Back.
+                        popUpTo(LoadingRoute) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
+
+            LoadingScreen(progress = state.progress)
+        }
 
         composable<MainRoute> {
             val vm: GameDataViewModel = viewModel(factory = sharedFactory)

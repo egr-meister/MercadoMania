@@ -3,10 +3,9 @@ package com.mercadomania.game.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
@@ -16,16 +15,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mercadomania.game.R
+import com.mercadomania.game.ui.Assets
 import com.mercadomania.game.ui.components.BazaarBackdrop
 import com.mercadomania.game.ui.components.MenuPlateButton
 import com.mercadomania.game.ui.components.ScreenHeader
 
 /**
- * The stall picker. Ornate framed plates, width-constrained to ~0.7 of the
- * screen and vertically scrollable, because the plate is a tall shape and five
- * of them will not fit on a short device.
+ * The stall picker.
+ *
+ * The ornate plate is a wide, tall shape, so its width is derived from the
+ * height actually left under the header: all five entries fit on one screen
+ * without scrolling, and the plate never grows past ~0.72 of the screen width.
  */
 @Composable
 fun MenuScreen(
@@ -38,58 +41,80 @@ fun MenuScreen(
     modifier: Modifier = Modifier
 ) {
     BazaarBackdrop(modifier = modifier) {
-        BoxWithConstraints(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding()
         ) {
-            val plateWidth = maxWidth * 0.70f
+            ScreenHeader(
+                title = stringResource(R.string.menu_title),
+                backDescription = stringResource(R.string.cd_back),
+                onBack = onBack
+            )
 
-            Column(modifier = Modifier.fillMaxSize()) {
-                ScreenHeader(
-                    title = stringResource(R.string.menu_title),
-                    backDescription = stringResource(R.string.cd_back),
-                    onBack = onBack
-                )
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                val listWidth = maxWidth
+                val listHeight = maxHeight
 
+                val heightLimited =
+                    ((listHeight - MENU_GAP * (MENU_ITEM_COUNT - 1)) / MENU_ITEM_COUNT) *
+                        Assets.BTN_MENU_ASPECT
+                val plateWidth: Dp = minOf(listWidth * 0.72f, heightLimited)
+                    .coerceAtLeast(MIN_PLATE_WIDTH)
+
+                // Scroll is a safety net for very short screens only.
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
+                        .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    MenuPlateButton(
-                        text = stringResource(R.string.menu_quiz),
-                        onClick = onQuiz,
-                        modifier = Modifier.width(plateWidth)
-                    )
-                    MenuPlateButton(
-                        text = stringResource(R.string.menu_pairs),
-                        onClick = onPairs,
-                        modifier = Modifier.width(plateWidth)
-                    )
-                    MenuPlateButton(
-                        text = stringResource(R.string.menu_results),
-                        onClick = onResults,
-                        modifier = Modifier.width(plateWidth)
-                    )
-                    MenuPlateButton(
-                        text = stringResource(R.string.menu_settings),
-                        onClick = onSettings,
-                        modifier = Modifier.width(plateWidth)
-                    )
-                    MenuPlateButton(
-                        text = stringResource(R.string.menu_rules),
-                        onClick = onRules,
-                        modifier = Modifier.width(plateWidth)
-                    )
-                    Spacer(Modifier.height(12.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = listHeight),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(
+                            MENU_GAP,
+                            Alignment.CenterVertically
+                        )
+                    ) {
+                        MenuPlateButton(
+                            text = stringResource(R.string.menu_quiz),
+                            onClick = onQuiz,
+                            modifier = Modifier.width(plateWidth)
+                        )
+                        MenuPlateButton(
+                            text = stringResource(R.string.menu_pairs),
+                            onClick = onPairs,
+                            modifier = Modifier.width(plateWidth)
+                        )
+                        MenuPlateButton(
+                            text = stringResource(R.string.menu_results),
+                            onClick = onResults,
+                            modifier = Modifier.width(plateWidth)
+                        )
+                        MenuPlateButton(
+                            text = stringResource(R.string.menu_settings),
+                            onClick = onSettings,
+                            modifier = Modifier.width(plateWidth)
+                        )
+                        MenuPlateButton(
+                            text = stringResource(R.string.menu_rules),
+                            onClick = onRules,
+                            modifier = Modifier.width(plateWidth)
+                        )
+                    }
                 }
             }
-
         }
     }
 }
+
+private const val MENU_ITEM_COUNT = 5
+private val MENU_GAP: Dp = 8.dp
+private val MIN_PLATE_WIDTH: Dp = 150.dp

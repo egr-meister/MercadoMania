@@ -15,12 +15,15 @@ data class QuizQuestion(
  *
  * @param id stable storage key - do not change it once players have scores
  * @param iconIndex index into `Assets.items` used as the category emblem
+ * @param mascotIndex index into `Assets.mascots` - the host who stands under
+ *   the answers for this category, one mascot per category
  */
 data class QuizCategory(
     val id: String,
     val title: String,
     val blurb: String,
     val iconIndex: Int,
+    val mascotIndex: Int,
     val questions: List<QuizQuestion>
 )
 
@@ -46,6 +49,7 @@ object QuizContent {
             title = "Bazaar Treasures",
             blurb = "The relics on the stalls",
             iconIndex = 3, // chest
+            mascotIndex = 1, // Pico the gecko - the runner who knows the stock
             questions = listOf(
                 QuizQuestion(
                     "Which relic marks the moment the bazaar closes for the night?",
@@ -105,6 +109,7 @@ object QuizContent {
             title = "Trade & Coin",
             blurb = "Haggling, coin and custom",
             iconIndex = 1, // crown
+            mascotIndex = 2, // Tino the automaton - built to weigh every coin
             questions = listOf(
                 QuizQuestion(
                     "What is the first rule of the Mercado floor?",
@@ -164,6 +169,7 @@ object QuizContent {
             title = "Bazaar Legends",
             blurb = "Tales told between the stalls",
             iconIndex = 5, // lamp
+            mascotIndex = 0, // Zafir the lamp genie - the legend himself
             questions = listOf(
                 QuizQuestion(
                     "Who is said to host the golden bazaar after dark?",

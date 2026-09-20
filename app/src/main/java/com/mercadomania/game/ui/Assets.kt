@@ -53,6 +53,21 @@ object Assets {
     /** width / height of `logo.png`. */
     const val LOGO_ASPECT: Float = 900f / 865f
 
+    /** The three mascots, in `mascot_a..mascot_c` order. */
+    val mascots: List<Int> = listOf(mascotA, mascotB, mascotC)
+
+    /** Safe lookup - an out-of-range index falls back to the first mascot. */
+    @DrawableRes
+    fun mascot(index: Int): Int = mascots.getOrElse(index) { mascots.first() }
+
+    /**
+     * Drawables worth decoding on the loading screen: the ones the very first
+     * frames need. Warming them means the main screen does not hitch while it
+     * decodes a megabyte of artwork on the UI thread.
+     */
+    val preloadOnStartup: List<Int>
+        get() = listOf(bgMain, logo, mascotA, mascotB, mascotC, btnMenu, btnPlate, plateRound)
+
     /** The twelve match icons, in `item_01..item_12` order. */
     val items: List<Int> = listOf(
         R.drawable.item_01,

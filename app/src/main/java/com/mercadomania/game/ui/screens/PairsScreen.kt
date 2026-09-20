@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -83,8 +84,6 @@ fun PairsScreen(
             val horizontalPadding = 16.dp
             val gap = 8.dp
             val columns = state.columns.coerceAtLeast(1)
-            val cardWidth: Dp =
-                (maxWidth - horizontalPadding * 2 - gap * (columns - 1)) / columns
 
             Column(modifier = Modifier.fillMaxSize()) {
                 ScreenHeader(
@@ -120,31 +119,67 @@ fun PairsScreen(
                     )
                 }
 
-                Column(
+                // The whole board has to be visible at once - a memory game
+                // where you scroll to see half the cards is unplayable. So the
+                // card size is derived from BOTH axes of the space actually
+                // left over, and the smaller of the two limits wins.
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = horizontalPadding, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(gap),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(horizontal = horizontalPadding, vertical = 8.dp)
                 ) {
-                    state.cards.chunked(columns).forEach { rowCards ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally)
+                    val gridWidth = maxWidth
+                    val gridHeight = maxHeight
+                    val rowCount = ((state.cards.size + columns - 1) / columns)
+                        .coerceAtLeast(1)
+
+                    val widthLimited = (gridWidth - gap * (columns - 1)) / columns
+                    val heightLimited =
+                        ((gridHeight - gap * (rowCount - 1)) / rowCount) * CARD_ASPECT
+                    val cardWidth: Dp = minOf(widthLimited, heightLimited)
+                        .coerceAtLeast(MIN_CARD_WIDTH)
+
+                    // The scroll is a safety net only: it engages solely when
+                    // a very small screen or a huge font scale makes even
+                    // MIN_CARD_WIDTH cards overflow.
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = gridHeight),
+                            verticalArrangement = Arrangement.spacedBy(
+                                gap,
+                                Alignment.CenterVertically
+                            ),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            rowCards.forEach { card ->
-                                MemoryCard(
-                                    card = card,
-                                    width = cardWidth,
-                                    enabled = !state.paused && !state.finished && !state.inputLocked,
-                                    onClick = { onFlip(card.id) }
-                                )
+                            state.cards.chunked(columns).forEach { rowCards ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        gap,
+                                        Alignment.CenterHorizontally
+                                    )
+                                ) {
+                                    rowCards.forEach { card ->
+                                        MemoryCard(
+                                            card = card,
+                                            width = cardWidth,
+                                            enabled = !state.paused &&
+                                                !state.finished &&
+                                                !state.inputLocked,
+                                            onClick = { onFlip(card.id) }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
-                    Spacer(Modifier.height(16.dp))
                 }
             }
 
@@ -241,7 +276,7 @@ private fun MemoryCard(
     Box(
         modifier = modifier
             .width(width)
-            .aspectRatio(0.78f)
+            .aspectRatio(CARD_ASPECT)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 14f * density
@@ -289,9 +324,7 @@ private fun CardBack(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(Assets.splashLogo),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp)
+            modifier = Modifier.fillMaxSize(0.62f)
         )
     }
 }
@@ -314,9 +347,7 @@ private fun CardFace(card: PairCard, modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(Assets.item(card.iconIndex)),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxSize(0.82f)
         )
         if (card.matched) {
             Box(
@@ -333,3 +364,9 @@ private fun CardFace(card: PairCard, modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Card width / height. The grid maths and the card itself must agree. */
+private const val CARD_ASPECT = 0.78f
+
+/** Never shrink a card below a comfortable touch target. */
+private val MIN_CARD_WIDTH = 44.dp

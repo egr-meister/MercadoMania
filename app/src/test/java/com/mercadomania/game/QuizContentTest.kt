@@ -66,6 +66,27 @@ class QuizContentTest {
     }
 
     @Test
+    fun `every category has its own mascot`() {
+        QuizContent.categories.forEach { category ->
+            assertTrue(
+                "category ${category.id} mascotIndex",
+                category.mascotIndex in 0 until MASCOT_COUNT
+            )
+        }
+        val used = QuizContent.categories.map { it.mascotIndex }
+        assertEquals(
+            "one mascot per category, no repeats",
+            used.size,
+            used.distinct().size
+        )
+    }
+
+    private companion object {
+        /** Mirrors `Assets.mascots.size` without pulling Android into the test. */
+        const val MASCOT_COUNT = 3
+    }
+
+    @Test
     fun `lookup is safe for unknown ids`() {
         assertNotNull(QuizContent.category("treasures"))
         assertNull(QuizContent.category("does-not-exist"))

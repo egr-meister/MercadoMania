@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,11 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mercadomania.game.R
 import com.mercadomania.game.ui.Assets
@@ -73,72 +78,91 @@ fun QuizScreen(
     BackHandler(enabled = state.paused) { onResume() }
 
     BazaarBackdrop(modifier = modifier) {
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding()
         ) {
-            ScreenHeader(
-                title = state.categoryTitle.ifBlank { stringResource(R.string.quiz_title) },
-                backDescription = stringResource(R.string.cd_back),
-                onBack = onBack,
-                trailing = {
-                    if (!state.finished) {
-                        RoundIconButton(
-                            icon = Assets.iconPause,
-                            contentDescription = stringResource(R.string.cd_pause),
-                            onClick = onPause
-                        )
-                    }
-                }
-            )
+            // Hoisted out of BoxWithConstraintsScope: the nested Column
+            // lambdas below cannot call `maxHeight` with an implicit receiver.
+            val mascotHeight: Dp = (maxHeight * 0.20f).coerceIn(110.dp, 220.dp)
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 18.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                ProgressStrip(
-                    progress = state.progress,
-                    label = stringResource(
-                        R.string.quiz_progress,
-                        state.displayNumber,
-                        state.totalQuestions
-                    ),
-                    progressDescription = stringResource(
-                        R.string.quiz_question_number,
-                        state.displayNumber,
-                        state.totalQuestions
-                    )
+            Column(modifier = Modifier.fillMaxSize()) {
+                ScreenHeader(
+                    title = state.categoryTitle.ifBlank { stringResource(R.string.quiz_title) },
+                    backDescription = stringResource(R.string.cd_back),
+                    onBack = onBack,
+                    trailing = {
+                        if (!state.finished) {
+                            RoundIconButton(
+                                icon = Assets.iconPause,
+                                contentDescription = stringResource(R.string.cd_pause),
+                                onClick = onPause
+                            )
+                        }
+                    }
                 )
 
-                Spacer(Modifier.height(18.dp))
-
-                ModalPanel(modifier = Modifier.fillMaxWidth()) {
-                    PanelBody(text = state.question?.text.orEmpty())
-                }
-
-                Spacer(Modifier.height(18.dp))
-
-                val options = state.question?.options.orEmpty()
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    options.forEachIndexed { index, option ->
-                        AnswerOption(
-                            text = option,
-                            index = index,
-                            state = state,
-                            onClick = { onAnswer(index) }
+                    ProgressStrip(
+                        progress = state.progress,
+                        label = stringResource(
+                            R.string.quiz_progress,
+                            state.displayNumber,
+                            state.totalQuestions
+                        ),
+                        progressDescription = stringResource(
+                            R.string.quiz_question_number,
+                            state.displayNumber,
+                            state.totalQuestions
                         )
-                    }
-                }
+                    )
 
-                Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(18.dp))
+
+                    ModalPanel(modifier = Modifier.fillMaxWidth()) {
+                        PanelBody(text = state.question?.text.orEmpty())
+                    }
+
+                    Spacer(Modifier.height(18.dp))
+
+                    val options = state.question?.options.orEmpty()
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        options.forEachIndexed { index, option ->
+                            AnswerOption(
+                                text = option,
+                                index = index,
+                                state = state,
+                                onClick = { onAnswer(index) }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    // The category's host, filling the space under the answers.
+                    // Decorative: the question and every option are already read
+                    // out, so a screen reader gains nothing from announcing it.
+                    Image(
+                        painter = painterResource(Assets.mascot(state.mascotIndex)),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(mascotHeight)
+                            .clearAndSetSemantics { }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+                }
             }
         }
 
