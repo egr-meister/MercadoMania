@@ -65,7 +65,10 @@ fun LevelsScreen(
                 .fillMaxSize()
                 .safeDrawingPadding()
         ) {
-            val bubbleSize: Dp = (maxWidth - 80.dp) / 3f
+            // Hoisted out of BoxWithConstraintsScope: inside the nested
+            // Column/Row lambdas `maxWidth` would need an explicit receiver.
+            val screenWidth: Dp = maxWidth
+            val bubbleSize: Dp = (screenWidth - 80.dp) / 3f
             val clearedCount = GameLogic.completedLevelCount(pairsBest)
 
             Column(modifier = Modifier.fillMaxSize()) {
@@ -122,7 +125,7 @@ fun LevelsScreen(
                     PlateButton(
                         text = stringResource(R.string.menu_rules),
                         onClick = onRules,
-                        modifier = Modifier.width(maxWidth * 0.52f)
+                        modifier = Modifier.width(screenWidth * 0.52f)
                     )
 
                     Spacer(Modifier.height(16.dp))
