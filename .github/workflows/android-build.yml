@@ -27,21 +27,41 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up the Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install SDK Platform 36 and Build Tools 36.0.0
+        # The runner image already ships the Android SDK and command-line
+        # tools, so this uses them directly instead of android-actions/
+        # setup-android, whose license step drops into an interactive
+        # "Accept? (y/N)" prompt and fails the job.
         run: |
-          sdkmanager --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
-          echo "ANDROID_BUILD_TOOLS=$ANDROID_SDK_ROOT/build-tools/36.0.0" >> "$GITHUB_ENV"
+          set -eu
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER=$(find "$SDK_ROOT/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          fi
+          if [ -z "${SDKMANAGER:-}" ] || [ ! -x "$SDKMANAGER" ]; then
+            echo "::error::Could not find sdkmanager under $SDK_ROOT"
+            exit 1
+          fi
+          echo "Using $SDKMANAGER"
+
+          # Accept licenses non-interactively. `yes` gets SIGPIPE when
+          # sdkmanager stops reading, which is expected, hence the guard.
+          yes | "$SDKMANAGER" --licenses > /dev/null 2>&1 || true
+
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_BUILD_TOOLS=$SDK_ROOT/build-tools/36.0.0" >> "$GITHUB_ENV"
 
       - name: Provision Gradle
         # A fixed Gradle version is provisioned here, so a committed
