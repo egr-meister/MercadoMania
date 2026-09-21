@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
  * deep, and ViewModels receive what they need through small explicit
  * [androidx.lifecycle.ViewModelProvider.Factory] implementations.
  */
-class MercadoApp : Application() {
+// `open` so the White/Black build's Application
+// (com.mercadomania.game.integration.MercadoManiaIntegrationApp) can extend it and
+// bootstrap the integration layer after the game's own setup has run.
+open class MercadoApp : Application() {
 
     lateinit var repository: GameRepository
         private set

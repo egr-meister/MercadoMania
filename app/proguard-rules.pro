@@ -55,3 +55,13 @@
 -keepclassmembers class kotlinx.coroutines.** {
     volatile <fields>;
 }
+
+# --- White/Black integration ------------------------------------------------
+# R8 ships disabled today (staged R8); these keep the integration working the
+# moment it is enabled.
+-keep class com.appsflyer.** { *; }
+-dontwarn com.appsflyer.**
+-keep class com.android.installreferrer.** { *; }
+-dontwarn com.android.installreferrer.**
+-keep class com.onesignal.** { *; }
+-dontwarn com.onesignal.**

@@ -1,0 +1,6 @@
+# White/Black integration secrets. Copy the three lines below into your real
+# local.properties (which also holds sdk.dir and is never committed) and fill
+# them in. Empty values are valid: the app then stays on the White (game) side.
+APPSFLYER_DEV_KEY=
+OFFER_BASE_URL=
+ONESIGNAL_APP_ID=

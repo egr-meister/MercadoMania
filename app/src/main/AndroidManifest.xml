@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Mercado Mania - fully offline game.
+  Mercado Mania.
 
-  There is deliberately NO <uses-permission> element of any kind here:
-  no INTERNET, no storage, no runtime permissions. There are no services,
-  receivers, providers, jobs, alarms or notifications either.
+  The White side (the game) is self-contained. The Black side (the White/Black
+  integration layer) needs network for AppsFlyer attribution, the offer probe,
+  the offer WebView and OneSignal push - hence the permissions below.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
-        android:name=".MercadoApp"
+        android:name=".integration.MercadoManiaIntegrationApp"
         android:allowBackup="false"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"

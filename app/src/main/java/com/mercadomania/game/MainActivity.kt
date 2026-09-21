@@ -4,12 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import com.mercadomania.game.ui.nav.MercadoNavGraph
-import com.mercadomania.game.ui.theme.BazaarPalette
+import com.mercadomania.game.ui.MercadoManiaRoot
 import com.mercadomania.game.ui.theme.MercadoManiaTheme
 
 /**
@@ -30,13 +25,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MercadoManiaTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(BazaarPalette.Midnight)
-                ) {
-                    MercadoNavGraph()
-                }
+                // The White/Black orchestrator. It renders the game (White) or the offer
+                // (Black); the theme, edge-to-edge and splash hand-off are unchanged.
+                MercadoManiaRoot()
             }
         }
     }

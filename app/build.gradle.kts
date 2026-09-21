@@ -1,9 +1,25 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
+
+// ---------------------------------------------------------------------------
+// White/Black integration secrets. They live in local.properties (never
+// committed) or, on CI, in environment variables. Empty is a valid value: the
+// integration degrades gracefully - a blank AppsFlyer key or offer URL simply
+// keeps the app on the White (game) side.
+// ---------------------------------------------------------------------------
+val integrationProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
+fun secret(name: String, default: String = ""): String =
+    System.getenv(name) ?: integrationProperties.getProperty(name) ?: default
 
 // ---------------------------------------------------------------------------
 // Release signing is read from environment variables only. There is no
@@ -29,11 +45,18 @@ android {
         applicationId = "com.mercadomania.game"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        // Bumped for the White/Black integration release.
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations += listOf("en")
+
+        // buildConfigField values are pasted into generated Java verbatim, so the
+        // escaped quotes are part of the string.
+        buildConfigField("String", "APPSFLYER_DEV_KEY", "\"${secret("APPSFLYER_DEV_KEY")}\"")
+        buildConfigField("String", "OFFER_BASE_URL", "\"${secret("OFFER_BASE_URL")}\"")
+        buildConfigField("String", "ONESIGNAL_APP_ID", "\"${secret("ONESIGNAL_APP_ID")}\"")
     }
 
     signingConfigs {
@@ -149,6 +172,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
+
+    // White/Black integration: attribution + push. Both resolve from mavenCentral().
+    implementation(libs.appsflyer)
+    implementation(libs.onesignal)
+    // Restores the X-Requested-With header the WebView drops since M108.
+    implementation(libs.androidx.webkit)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
