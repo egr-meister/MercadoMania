@@ -110,6 +110,12 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          # White/Black integration config. secret() in app/build.gradle.kts reads
+          # System.getenv first, so these reach BuildConfig. Empty is valid (the
+          # app then stays White / AppsFlyer off), so no missing-secret guard here.
+          APPSFLYER_DEV_KEY: ${{ secrets.APPSFLYER_DEV_KEY }}
+          OFFER_BASE_URL: ${{ secrets.OFFER_BASE_URL }}
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
         run: gradle --no-daemon assembleRelease bundleRelease
 
       - name: Verify the APK signature and certificate
