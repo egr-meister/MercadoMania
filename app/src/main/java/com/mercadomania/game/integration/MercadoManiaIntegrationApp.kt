@@ -14,23 +14,19 @@ import com.mercadomania.game.MercadoApp
  * The manifest's `android:name` must point at this class.
  *
  * Order matters:
- *  - storage before the AppsFlyer manager (the manager reads `attributionSettled`);
- *  - the user agent before anything can probe;
- *  - OneSignal after AppsFlyer, so the AppsFlyer UID can seed the OneSignal external id.
+ *  - storage first (everyone reads from it);
+ *  - the accelerometer window is a whole second, so sampling must begin at launch, not
+ *    where the offer URL is assembled;
+ *  - the FCM push token must be requested before the single click, so [PushManager.init]
+ *    runs at launch too.
  */
 class MercadoManiaIntegrationApp : MercadoApp() {
     override fun onCreate() {
         super.onCreate() // the game's own repository / sound / preference sync, unchanged
         IntegrationStorage.init(this)
-        // Roll the AppsFlyer hold-back bucket once, before the manager reads it. Sticky
-        // for the life of the install.
-        Holdback.resolve()
         DeviceSignals.init(this)
-        // Sampling takes a full second, so it must begin at launch: starting it where the
-        // offer URL is assembled would mean blocking there for the whole window.
         AccelerometerProbe.start(this)
-        UserAgentProvider.init(this)
-        AppsFlyerManager.init(this)
-        OneSignalManager.init(this)
+        AdjustManager.init(this)
+        PushManager.init(this)
     }
 }

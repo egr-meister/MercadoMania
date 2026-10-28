@@ -1,3 +1,5 @@
+import java.io.File
+import java.util.Base64
 import java.util.Properties
 
 plugins {
@@ -5,12 +7,13 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 // ---------------------------------------------------------------------------
 // White/Black integration secrets. They live in local.properties (never
 // committed) or, on CI, in environment variables. Empty is a valid value: the
-// integration degrades gracefully - a blank AppsFlyer key or offer URL simply
+// integration degrades gracefully - a blank Adjust token or offer URL simply
 // keeps the app on the White (game) side.
 // ---------------------------------------------------------------------------
 val integrationProperties = Properties().apply {
@@ -37,26 +40,100 @@ val hasReleaseSigning: Boolean =
         !envKeyAlias.isNullOrBlank() &&
         !envKeyPassword.isNullOrBlank()
 
+// ---------------------------------------------------------------------------
+// google-services.json materialisation (Firebase Cloud Messaging).
+//
+// The file never enters the repository. It arrives like the other secrets:
+// GOOGLE_SERVICES_JSON (base64) from local.properties locally, GitHub Secrets on
+// CI. The google-services plugin needs a file per build type whose package_name
+// matches the applied applicationId, so one is written for debug and one for
+// release before the plugin reads them.
+//
+//   - debug ALWAYS gets a stub: its applicationId ends in `.debug`, which the real
+//     production file never matches, and the plugin fails on a mismatch.
+//   - release gets the real decoded file when the secret is present, otherwise a
+//     stub so a local build still assembles. A stub ships WITHOUT working push:
+//     project_number is all zeros. CI rejects a release without the real secret
+//     (see .github/workflows); locally this is only good for White/Black, routing,
+//     signals and signature - not for verifying push.
+// ---------------------------------------------------------------------------
+val gameApplicationId = "com.mercadomania.game"
+
+fun stubGoogleServices(packageName: String): String = """
+    {
+      "project_info": {
+        "project_number": "000000000000",
+        "project_id": "mercado-mania-stub",
+        "storage_bucket": "mercado-mania-stub.appspot.com"
+      },
+      "client": [
+        {
+          "client_info": {
+            "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+            "android_client_info": { "package_name": "$packageName" }
+          },
+          "oauth_client": [],
+          "api_key": [ { "current_key": "AIzaSyStubStubStubStubStubStubStubStub0000" } ],
+          "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+        }
+      ],
+      "configuration_version": "1"
+    }
+""".trimIndent()
+
+fun writeGoogleServices(buildTypeDir: String, packageName: String, allowReal: Boolean) {
+    val outDir = File(projectDir, "src/$buildTypeDir")
+    outDir.mkdirs()
+    val out = File(outDir, "google-services.json")
+    val base64 = secret("GOOGLE_SERVICES_JSON")
+    val real = if (allowReal && base64.isNotBlank()) {
+        runCatching { String(Base64.getMimeDecoder().decode(base64.trim())) }
+            .getOrNull()
+            ?.takeIf { it.contains("\"project_number\"") }
+    } else {
+        null
+    }
+    if (real != null) {
+        out.writeText(real)
+    } else {
+        if (allowReal) {
+            logger.warn("GOOGLE_SERVICES_JSON is absent or unparsable - writing a push-less stub for $buildTypeDir.")
+        }
+        out.writeText(stubGoogleServices(packageName))
+    }
+}
+
+// Written at configuration time so both files exist before the google-services
+// plugin processes them.
+writeGoogleServices(buildTypeDir = "debug", packageName = "$gameApplicationId.debug", allowReal = false)
+writeGoogleServices(buildTypeDir = "release", packageName = gameApplicationId, allowReal = true)
+
 android {
     namespace = "com.mercadomania.game"
+    // Stays at 36 (Android 16, stable): API 37 ships only as the android-37.0 preview
+    // platform, and the sibling apps from this skill ship at 36 too. Bump when android-37
+    // is a stable platform.
     compileSdk = 36
 
     defaultConfig {
         applicationId = "com.mercadomania.game"
         minSdk = 24
         targetSdk = 36
-        // Bumped for the White/Black integration release.
-        versionCode = 2
-        versionName = "1.0.1"
+        // Bumped for the Adjust + FCM migration and the localisation / theme pass.
+        versionCode = 4
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations += listOf("en")
+        // No resourceConfigurations filter: all seven shipped locales
+        // (values + values-ru/fr/es/pt/it/de) must survive into the APK.
 
         // buildConfigField values are pasted into generated Java verbatim, so the
-        // escaped quotes are part of the string.
-        buildConfigField("String", "APPSFLYER_DEV_KEY", "\"${secret("APPSFLYER_DEV_KEY")}\"")
+        // escaped quotes are part of the string. Adjust attribution + Keitaro offer
+        // routing; empty means White-only.
+        buildConfigField("String", "ADJUST_APP_TOKEN", "\"${secret("ADJUST_APP_TOKEN")}\"")
         buildConfigField("String", "OFFER_BASE_URL", "\"${secret("OFFER_BASE_URL")}\"")
-        buildConfigField("String", "ONESIGNAL_APP_ID", "\"${secret("ONESIGNAL_APP_ID")}\"")
+        // aso | prily - the campaign group decides the URL shape (sub1 in path for prily).
+        buildConfigField("String", "OFFER_ROUTING", "\"${secret("OFFER_ROUTING", "aso")}\"")
     }
 
     signingConfigs {
@@ -146,6 +223,9 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
+    // AppCompat: MainActivity is an AppCompatActivity so the in-app language picker
+    // (AppCompatDelegate.setApplicationLocales) survives a restart below API 33.
+    implementation(libs.androidx.appcompat)
 
     // Compose: every package imported by the app is a DIRECT dependency here,
     // including runtime, foundation and animation.
@@ -173,9 +253,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
 
-    // White/Black integration: attribution + push. Both resolve from mavenCentral().
-    implementation(libs.appsflyer)
-    implementation(libs.onesignal)
+    // White/Black integration: Adjust attribution + Firebase Cloud Messaging.
+    implementation(libs.adjust)
+    // installreferrer and the AdID provider are declared explicitly: without Play Install
+    // Referrer and GAID, Adjust attribution degrades to organic and the tracker gets
+    // traffic with no campaign and no sub1..subN.
+    implementation(libs.installreferrer)
+    implementation(libs.play.services.ads.identifier)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
     // Restores the X-Requested-With header the WebView drops since M108.
     implementation(libs.androidx.webkit)
 

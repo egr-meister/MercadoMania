@@ -51,9 +51,9 @@ object DeviceSignals {
         }
 
     /**
-     * sub14. Cached deliberately rather than because the inputs are immutable - a
-     * debugger can attach and USB debugging can be toggled mid-session, and sub14
-     * flipping between two URL builds in one run would be worse than a stale answer.
+     * sub14. Cached deliberately rather than because the inputs are immutable - a debugger
+     * can attach and USB debugging can be toggled mid-session, and sub14 flipping between
+     * two URL builds in one run would be worse than a stale answer.
      */
     val isTestEnvironment: Boolean by lazy {
         runCatching { TestEnvironment.isTestEnvironment(snapshot()) }.getOrElse {
@@ -85,9 +85,6 @@ object DeviceSignals {
             debuggable = safe("debuggable") {
                 (appContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
             } ?: false,
-            adbEnabled = safe("adb") {
-                Settings.Global.getString(resolver, Settings.Global.ADB_ENABLED)
-            },
             hardware = Build.HARDWARE.orEmpty(),
             product = Build.PRODUCT.orEmpty(),
             model = Build.MODEL.orEmpty(),

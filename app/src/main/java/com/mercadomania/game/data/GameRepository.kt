@@ -70,6 +70,12 @@ class GameRepository(context: Context) {
         update { current -> current.copy(settings = current.settings.copy(soundEnabled = enabled)) }
     }
 
+    /** Persists the theme choice ("system" | "light" | "dark"). */
+    suspend fun setThemeMode(mode: String) {
+        if (mode.isBlank()) return
+        update { current -> current.copy(settings = current.settings.copy(themeMode = mode)) }
+    }
+
     /** Wipes every best score and unlocked level, keeping nothing behind. */
     suspend fun resetAll() {
         runCatching {

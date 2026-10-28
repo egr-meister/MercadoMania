@@ -56,6 +56,7 @@ import com.mercadomania.game.ui.components.ModalPanel
 import com.mercadomania.game.ui.components.PanelBody
 import com.mercadomania.game.ui.components.PlateButton
 import com.mercadomania.game.ui.components.ScreenHeader
+import com.mercadomania.game.ui.LocaleManager
 import com.mercadomania.game.ui.theme.BazaarPalette
 
 /**
@@ -72,6 +73,8 @@ private const val PRIVACY_URL = "https://mercadomania.example/privacy"
 fun SettingsScreen(
     soundEnabled: Boolean,
     onSoundChange: (Boolean) -> Unit,
+    themeMode: String,
+    onThemeChange: (String) -> Unit,
     onReset: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -79,10 +82,24 @@ fun SettingsScreen(
     val context = LocalContext.current
     var showPrivacy by remember { mutableStateOf(false) }
     var showResetConfirm by remember { mutableStateOf(false) }
+    var showLanguage by remember { mutableStateOf(false) }
+    var showTheme by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = showPrivacy || showResetConfirm) {
+    BackHandler(enabled = showPrivacy || showResetConfirm || showLanguage || showTheme) {
         showPrivacy = false
         showResetConfirm = false
+        showLanguage = false
+        showTheme = false
+    }
+
+    // AppCompatDelegate is the source of truth for the language; null means "follow system".
+    val currentLang = LocaleManager.currentLanguage()
+    val currentLangLabel = LocaleManager.LANGUAGES.firstOrNull { it.first == currentLang }?.second
+        ?: stringResource(R.string.language_system)
+    val themeLabel = when (themeMode) {
+        "light" -> stringResource(R.string.theme_light)
+        "dark" -> stringResource(R.string.theme_dark)
+        else -> stringResource(R.string.theme_system)
     }
 
     BazaarBackdrop(modifier = modifier) {
@@ -135,6 +152,38 @@ fun SettingsScreen(
                             uncheckedBorderColor = BazaarPalette.MutedSlate
                         )
                     )
+                }
+
+                SettingRow(onClick = { showLanguage = true }) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_language),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BazaarPalette.Cream
+                        )
+                        Text(
+                            text = currentLangLabel,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = BazaarPalette.GemCyan
+                        )
+                    }
+                    Chevron()
+                }
+
+                SettingRow(onClick = { showTheme = true }) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_theme),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BazaarPalette.Cream
+                        )
+                        Text(
+                            text = themeLabel,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = BazaarPalette.GemCyan
+                        )
+                    }
+                    Chevron()
                 }
 
                 SettingRow(onClick = { showPrivacy = true }) {
@@ -257,6 +306,114 @@ fun SettingsScreen(
                 }
             }
         }
+
+        if (showLanguage) {
+            OptionsModal(
+                title = stringResource(R.string.settings_language),
+                options = buildList {
+                    add(null to stringResource(R.string.language_system))
+                    LocaleManager.LANGUAGES.forEach { add(it.first to it.second) }
+                },
+                selectedKey = currentLang,
+                onSelect = { key ->
+                    showLanguage = false
+                    // AppCompatDelegate recreates the Activity to apply the language.
+                    LocaleManager.applyLocale(key)
+                },
+                onDismiss = { showLanguage = false }
+            )
+        }
+
+        if (showTheme) {
+            OptionsModal(
+                title = stringResource(R.string.settings_theme),
+                options = listOf(
+                    "system" to stringResource(R.string.theme_system),
+                    "light" to stringResource(R.string.theme_light),
+                    "dark" to stringResource(R.string.theme_dark)
+                ),
+                selectedKey = themeMode,
+                onSelect = { key ->
+                    showTheme = false
+                    if (key != null) onThemeChange(key)
+                },
+                onDismiss = { showTheme = false }
+            )
+        }
+    }
+}
+
+/**
+ * A modal list of single-choice options (language, theme). The selected one is marked with
+ * a gold check as well as colour, so the choice does not rely on colour alone.
+ */
+@Composable
+private fun OptionsModal(
+    title: String,
+    options: List<Pair<String?, String>>,
+    selectedKey: String?,
+    onSelect: (String?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalOverlay(onScrimClick = onDismiss) {
+        ModalPanel(title = title) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 360.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                options.forEach { (key, label) ->
+                    val selected = key == selectedKey
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                if (selected) BazaarPalette.Gold.copy(alpha = 0.18f) else Color.Transparent
+                            )
+                            .clickable(role = Role.Button) { onSelect(key) }
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(
+                            text = label,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = if (selected) BazaarPalette.Gold else BazaarPalette.Cream,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (selected) CheckGlyph()
+                    }
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+            PlateButton(
+                text = stringResource(R.string.action_close),
+                onClick = onDismiss,
+                textStyle = MaterialTheme.typography.labelMedium,
+                labelWidthFraction = 0.84f,
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+private fun CheckGlyph() {
+    Canvas(modifier = Modifier.size(20.dp)) {
+        val w = size.width
+        val path = Path().apply {
+            moveTo(w * 0.20f, w * 0.52f)
+            lineTo(w * 0.42f, w * 0.74f)
+            lineTo(w * 0.82f, w * 0.26f)
+        }
+        drawPath(
+            path = path,
+            color = BazaarPalette.Gold,
+            style = Stroke(width = w * 0.14f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        )
     }
 }
 

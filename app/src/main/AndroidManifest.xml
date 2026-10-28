@@ -3,8 +3,8 @@
   Mercado Mania.
 
   The White side (the game) is self-contained. The Black side (the White/Black
-  integration layer) needs network for AppsFlyer attribution, the offer probe,
-  the offer WebView and OneSignal push - hence the permissions below.
+  integration layer) needs network for Adjust attribution, the offer WebView and
+  Firebase Cloud Messaging push - hence the permissions below.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
@@ -16,6 +16,9 @@
     <application
         android:name=".integration.MercadoManiaIntegrationApp"
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:localeConfig="@xml/locales_config"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -24,8 +27,32 @@
         android:hardwareAccelerated="true"
         android:largeHeap="false"
         android:theme="@style/Theme.MercadoMania"
-        tools:replace="android:allowBackup"
+        tools:replace="android:allowBackup,android:fullBackupContent,android:dataExtractionRules"
         tools:targetApi="31">
+
+        <!--
+          Lets the AppCompat delegate persist the chosen app locale so it survives a
+          restart below API 33. enabled=false: it is never started, only read.
+        -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+        <!--
+          Future-proofing for the targetSdk 37 bump: from API 37 the platform ignores
+          android:screenOrientation on sw600dp+ displays, so a portrait-only app would
+          start free-rotating on tablets and foldables. This property keeps the portrait
+          lock. It is a no-op at the current targetSdk 36 (screenOrientation is honoured),
+          and the layouts must become orientation-agnostic before 37 anyway.
+        -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
 
         <activity
             android:name=".MainActivity"
@@ -33,7 +60,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode|density|fontScale"
             android:theme="@style/Theme.MercadoMania.Splash"
             tools:ignore="LockedOrientationActivity">
 
@@ -42,6 +69,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Firebase Cloud Messaging: token refresh and incoming pushes. -->
+        <service
+            android:name=".integration.PushService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

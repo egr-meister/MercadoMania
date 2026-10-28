@@ -1,11 +1,6 @@
 package com.mercadomania.game.integration
 
-/**
- * sub14: is this install running somewhere that is not a real user's phone.
- *
- * Pure Kotlin. Every platform read happens in [DeviceSignals] and arrives here as a
- * [Snapshot], which keeps the detection rules readable and free of Android imports.
- */
+/** sub14: is this install running somewhere that is not a real user's phone. */
 object TestEnvironment {
 
     data class Snapshot(
@@ -13,7 +8,6 @@ object TestEnvironment {
         val instrumentationPresent: Boolean = false,
         val debuggerConnected: Boolean = false,
         val debuggable: Boolean = false,
-        val adbEnabled: String? = null,
         val hardware: String = "",
         val product: String = "",
         val model: String = "",
@@ -30,7 +24,6 @@ object TestEnvironment {
     // Without a trailing underscore - the "<marker>_" prefix is applied at the comparison.
     // "sdk" is load-bearing: the current Android Studio AVD reports
     // product = "sdk_gphone64_arm64", which matches only through "sdk" + the "_" rule.
-    // Removing it as "too broad" silently switches emulator detection off.
     private val PRODUCT_MARKERS = listOf(
         "sdk", "google_sdk", "vbox86p", "emulator", "simulator",
     )
@@ -44,10 +37,10 @@ object TestEnvironment {
             s.instrumentationPresent ||
             s.debuggerConnected ||
             s.debuggable ||
-            // Fires on any user who left developer options on, and there are more of them
-            // than you would guess. Kept on its own line so it can be dropped alone.
-            s.adbEnabled == "1" ||
             isEmulator(s)
+    // ADB_ENABLED is deliberately NOT here: it fires on everyone who ever opened developer
+    // options, and there are far more of them than you would guess — tagging them as test
+    // traffic cuts off paying users.
 
     fun isEmulator(s: Snapshot): Boolean {
         val hardware = s.hardware.lowercase()
@@ -67,10 +60,8 @@ object TestEnvironment {
 
         if (fingerprint.startsWith("generic") || fingerprint.contains("/sdk_")) return true
 
-        // Noisy in the same way ADB_ENABLED is: every AOSP-derived custom ROM and a long
-        // tail of grey-market retail devices ship test-keys builds, and those are real
-        // users. On its own line so it can be dropped alone.
-        if (fingerprint.endsWith("test-keys")) return true
+        // test-keys is deliberately NOT a marker: every AOSP-derived custom ROM and a long
+        // tail of grey-market retail devices ship test-keys builds, and those are real users.
 
         // Both, not either - a single "generic" is common enough on real hardware.
         if (s.brand.lowercase().startsWith("generic") &&

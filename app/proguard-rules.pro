@@ -58,10 +58,10 @@
 
 # --- White/Black integration ------------------------------------------------
 # R8 ships disabled today (staged R8); these keep the integration working the
-# moment it is enabled.
--keep class com.appsflyer.** { *; }
--dontwarn com.appsflyer.**
+# moment it is enabled. Trackers reach their own classes by reflection; without
+# these a release build compiles and then crashes only on live traffic. Firebase
+# Messaging ships its own consumer rules.
+-keep class com.adjust.sdk.** { *; }
+-dontwarn com.adjust.sdk.**
 -keep class com.android.installreferrer.** { *; }
 -dontwarn com.android.installreferrer.**
--keep class com.onesignal.** { *; }
--dontwarn com.onesignal.**

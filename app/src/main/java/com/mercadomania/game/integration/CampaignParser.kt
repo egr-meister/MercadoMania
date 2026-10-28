@@ -1,7 +1,7 @@
 package com.mercadomania.game.integration
 
 /**
- * Splits an AppsFlyer `campaign` value into positional sub-parameters.
+ * Splits a tracker `campaign` value into positional sub-parameters.
  *
  * The network packs several fields into one underscore-joined string; the tracker on the
  * receiving end expects them back as sub1..subN alongside the untouched original.

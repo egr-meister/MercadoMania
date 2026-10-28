@@ -3,14 +3,16 @@
 
     <!-- Base application theme. Compose owns colours/typography at runtime;
          this only has to give the window a correct background and let the
-         activity draw edge to edge. -->
-    <style name="Theme.MercadoMania" parent="android:Theme.Material.NoActionBar">
+         activity draw edge to edge.
+
+         The parent is an AppCompat theme because MainActivity is an
+         AppCompatActivity (required for the in-app language picker to persist
+         below API 33). -->
+    <style name="Theme.MercadoMania" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/mm_midnight</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
     </style>
 
     <!-- Launch theme: themed background colour + the small crest.
