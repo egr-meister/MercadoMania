@@ -26,6 +26,9 @@ class MercadoManiaIntegrationApp : MercadoApp() {
         IntegrationStorage.init(this)
         DeviceSignals.init(this)
         AccelerometerProbe.start(this)
+        // Reading the GAID blocks on Google Play Services, so start it at launch alongside
+        // the accelerometer and the push token - it must ride the single click.
+        GaidProbe.start(this)
         AdjustManager.init(this)
         PushManager.init(this)
     }

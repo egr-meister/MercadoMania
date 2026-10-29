@@ -119,9 +119,10 @@ android {
         applicationId = "com.mercadomania.game"
         minSdk = 24
         targetSdk = 36
-        // Bumped for the Adjust + FCM migration and the localisation / theme pass.
-        versionCode = 4
-        versionName = "1.0.3"
+        // Bumped for the Adjust + FCM migration, the localisation / theme pass, and the
+        // gps_adid (GAID) key in the single click.
+        versionCode = 5
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // No resourceConfigurations filter: all seven shipped locales
