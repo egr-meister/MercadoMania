@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  API 31+. The White verdict (white_locked) is irreversible by design; a flag restored
+  from backup onto a brand-new device would pin a fresh install to White forever, on a
+  device the tracker has never seen. Exclude integration and Adjust prefs from both
+  cloud backup and device transfer. Backup is also turned off entirely in the manifest;
+  this is the second line of defence if it is ever turned back on.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/" />
+        <exclude domain="sharedpref" path="integration_prefs.xml" />
+        <exclude domain="sharedpref" path="adjust_preferences.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/" />
+        <exclude domain="sharedpref" path="integration_prefs.xml" />
+        <exclude domain="sharedpref" path="adjust_preferences.xml" />
+    </device-transfer>
+</data-extraction-rules>

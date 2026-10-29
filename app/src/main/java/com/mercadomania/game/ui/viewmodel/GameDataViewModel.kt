@@ -51,6 +51,12 @@ class GameDataViewModel(
         soundManager.play(Sfx.CLICK)
         viewModelScope.launch { repository.resetAll() }
     }
+
+    /** Persists the theme choice; MainActivity observes it and re-themes live. */
+    fun setThemeMode(mode: String) {
+        soundManager.play(Sfx.CLICK)
+        viewModelScope.launch { repository.setThemeMode(mode) }
+    }
 }
 
 /** Plain factory - no DI framework anywhere in this project. */

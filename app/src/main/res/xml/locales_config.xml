@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The seven languages the app ships. A language absent from this list silently fails to
+  apply on API 33+: the picker changes nothing and logs nothing. en is the fallback for
+  every system language not listed here.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="ru" />
+    <locale android:name="fr" />
+    <locale android:name="es" />
+    <locale android:name="pt" />
+    <locale android:name="it" />
+    <locale android:name="de" />
+</locale-config>

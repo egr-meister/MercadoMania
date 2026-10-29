@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Up to API 31 (fullBackupContent). Many SDKs declare their exclusions only here, which
+  silently does nothing on Android 12+ - see data_extraction_rules.xml for that path.
+  Backup is disabled in the manifest; this is a second line of defence.
+-->
+<full-backup-content>
+    <exclude domain="file" path="datastore/" />
+    <exclude domain="sharedpref" path="integration_prefs.xml" />
+    <exclude domain="sharedpref" path="adjust_preferences.xml" />
+</full-backup-content>

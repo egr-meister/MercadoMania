@@ -10,7 +10,14 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Settings(
-    val soundEnabled: Boolean = true
+    val soundEnabled: Boolean = true,
+    /**
+     * Theme choice: "system" | "light" | "dark". Stored as a string so an older or newer
+     * build decodes it safely; an unknown value falls back to the default in
+     * [com.mercadomania.game.ui.theme.ThemeMode.fromStorage]. The chosen language is NOT
+     * stored here - AppCompatDelegate is the single source of truth for that.
+     */
+    val themeMode: String = "system"
 )
 
 /**

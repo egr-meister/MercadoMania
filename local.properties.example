@@ -1,6 +1,12 @@
-# White/Black integration secrets. Copy the three lines below into your real
+# White/Black integration secrets. Copy these lines into your real
 # local.properties (which also holds sdk.dir and is never committed) and fill
 # them in. Empty values are valid: the app then stays on the White (game) side.
-APPSFLYER_DEV_KEY=
+
+# Adjust application token (Adjust dashboard -> your app).
+ADJUST_APP_TOKEN=
+# Keitaro campaign link. Must start with http:// or https:// or the install goes White forever.
 OFFER_BASE_URL=
-ONESIGNAL_APP_ID=
+# Campaign group shape: aso (default) or prily (sub1 also goes into the path).
+OFFER_ROUTING=aso
+# base64 of google-services.json (Firebase). Empty = builds with a stub and NO working push.
+GOOGLE_SERVICES_JSON=

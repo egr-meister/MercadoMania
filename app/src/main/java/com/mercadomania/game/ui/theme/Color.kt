@@ -54,4 +54,16 @@ object BazaarPalette {
     /** Panel gradient stops for Compose-drawn modal panels. */
     val PanelTop = Color(0xFF16307F)
     val PanelBottom = Color(0xFF061845)
+
+    // -----------------------------------------------------------------------
+    // Light theme. The bazaar artwork is a fixed dark photograph, so light mode
+    // re-tints the Material surfaces (dialogs, switches, text) against a warm
+    // parchment rather than repainting the whole screen; the backdrop stays dark
+    // by design. These exist so the Settings theme toggle is a real change.
+    // -----------------------------------------------------------------------
+    val LightBackground = Color(0xFFFBF3DD)
+    val LightSurface = Color(0xFFFFFDF5)
+    val LightSurfaceVariant = Color(0xFFEDE0B8)
+    val LightOnSurface = Color(0xFF241A05)
+    val LightOnSurfaceVariant = Color(0xFF5A4A1A)
 }

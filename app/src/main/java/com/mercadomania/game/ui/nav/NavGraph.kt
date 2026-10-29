@@ -253,6 +253,8 @@ fun MercadoNavGraph(
             SettingsScreen(
                 soundEnabled = state.data.settings.soundEnabled,
                 onSoundChange = vm::setSoundEnabled,
+                themeMode = state.data.settings.themeMode,
+                onThemeChange = vm::setThemeMode,
                 onReset = vm::resetProgress,
                 onBack = { vm.click(); navController.popBackStack() }
             )
